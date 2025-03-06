@@ -1,4 +1,4 @@
-FROM golang:1.22.5-alpine AS builder
+FROM golang:1.23.7-alpine3.21 AS builder
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ RUN go mod download
 COPY . .
 
 #DESABILITA OS COPILADORES DO C QUE NÃO ESTÁ PRESENTE NA IMAGEM FINAL
-RUN CGO_ENABLED=0 GOOS=linux go build -o fileloader
+RUN CGO_ENABLED=0 GOOS=linux go build -o apiclientes
 
 FROM alpine:latest
 
@@ -20,4 +20,4 @@ COPY --from=builder /app .
 
 EXPOSE 8080
 
-CMD ["./fileloader"]
+CMD ["./apiclientes"]
