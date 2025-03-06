@@ -1,17 +1,17 @@
 package utils
 
 import (
-	"github.com/Gileno29/clientes-API/models" 
 	"log"
+
+	"github.com/Gileno29/clientes-API/models"
 
 	"gorm.io/gorm"
 )
 
 func VerificarTabelaClientes(db *gorm.DB) error {
-	
+
 	if !db.Migrator().HasTable(&models.Cliente{}) {
 		log.Println("Tabela de clientes não encontrada. Criando tabela...")
-
 
 		err := db.AutoMigrate(&models.Cliente{})
 		if err != nil {

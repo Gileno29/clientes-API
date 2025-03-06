@@ -1,10 +1,17 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Cliente struct {
-	gorm.Model
-	Documento string `gorm:"unique;not null"` 
-	Nome      string `gorm:"not null"`       
-	Blocklist bool   `gorm:"default:false"`   
+	//gorm.Model
+	Documento   string `gorm:"primaryKey;type:varchar(14)"`
+	RazaoSocial string `gorm:"not null"`
+	Blocklist   bool   `gorm:"default:false"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	DeletedAt   gorm.DeletedAt `gorm:"index"`
 }

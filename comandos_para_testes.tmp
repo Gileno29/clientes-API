@@ -1,0 +1,5 @@
+curl -X POST http://localhost:8080/clientes -H "Content-Type: application/json" -d '{
+  "documento": "12345678901",
+  "nome": "João Silva",
+  "blocklist": false
+}'

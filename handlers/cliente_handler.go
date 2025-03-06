@@ -44,12 +44,12 @@ func ListarClientes(c *gin.Context) {
 	query := database.DB
 
 	// Filtro por nome/razão social
-	if nome := c.Query("nome"); nome != "" {
-		query = query.Where("nome LIKE ?", "%"+nome+"%")
+	if nome := c.Query("razao_social"); nome != "" {
+		query = query.Where("razao_social LIKE ?", "%"+nome+"%")
 	}
 
 	// Ordenação por nome
-	query.Order("nome asc").Find(&clientes)
+	query.Order("razao_social asc").Find(&clientes)
 
 	c.JSON(http.StatusOK, clientes)
 }
@@ -68,7 +68,7 @@ func VerificarCliente(c *gin.Context) {
 
 func Status(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"uptime":   "X segundos", // Implemente a lógica de up-time
+		"uptime":   "X segundos",    // Implemente a lógica de up-time
 		"requests": "X requisições", // Implemente a contagem de requisições
 	})
 }

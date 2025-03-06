@@ -38,7 +38,7 @@ services:
 
 
 volumes:
-  postgres_data:
+  data:
 
 networks:
   database:
