@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/Gileno29/clientes-API/database"
 	"github.com/Gileno29/clientes-API/models"

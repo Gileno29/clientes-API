@@ -1,8 +1,8 @@
 package main
 
 import (
-	"cliente-api/database"
-	"cliente-api/handlers"
+	"github.com/Gileno29/clientes-API/database"
+	"github.com/Gileno29/clientes-API/handlers"
 
 	"github.com/gin-gonic/gin"
 )
