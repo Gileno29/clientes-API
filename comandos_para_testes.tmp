@@ -1,5 +1,40 @@
 curl -X POST http://localhost:8080/clientes -H "Content-Type: application/json" -d '{
   "documento": "12345678901",
-  "nome": "João Silva",
+  "razaosocial": "João Silva",
   "blocklist": false
 }'
+
+
+
+curl -X PUT http://localhost:8080/clientes/12345678901 \
+-H "Content-Type: application/json" \
+-d '{
+  "nome": "João da Silva",
+  "blocklist": true
+}'
+
+
+# ATUALIZACOES PARCIAIS  E TOTAIS
+curl -X PUT http://localhost:8080/clientes/12345678901 \
+-H "Content-Type: application/json" \
+-d '{
+  "nome": "Nova Razão Social"
+}'
+
+
+curl -X PUT http://localhost:8080/clientes/12345678901 \
+-H "Content-Type: application/json" \
+-d '{
+  "blocklist": true
+}'
+
+curl -X PUT http://localhost:8080/clientes/12345678901 \
+-H "Content-Type: application/json" \
+-d '{
+  "nome": "Nova Razão Social",
+  "blocklist": true
+}'
+
+curl -X PUT http://localhost:8080/clientes/12345678901 \
+-H "Content-Type: application/json" \
+-d '{}'

@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/Gileno29/clientes-API/database"
 	"github.com/Gileno29/clientes-API/models"
@@ -30,7 +32,6 @@ func CadastrarCliente(c *gin.Context) {
 		return
 	}
 
-	// Cria o cliente
 	if err := database.DB.Create(&cliente).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao cadastrar cliente"})
 		return
@@ -66,9 +67,51 @@ func VerificarCliente(c *gin.Context) {
 	c.JSON(http.StatusOK, cliente)
 }
 
+func AtualizaCliente(c *gin.Context) {
+
+	documento := c.Param("documento")
+	documento = strings.ReplaceAll(documento, ".", "")
+	documento = strings.ReplaceAll(documento, "-", "")
+	documento = strings.ReplaceAll(documento, "/", "")
+	documento = strings.TrimSpace(documento)
+
+	fmt.Println("Esse é meu documento ", documento)
+	var cliente models.Cliente
+	if err := database.DB.Where("documento = ?", documento).First(&cliente).Error; err != nil {
+		fmt.Println("Erro ao buscar cliente", err)
+		c.JSON(http.StatusConflict, gin.H{"error": "Cliente Não identificado"})
+		return
+	}
+
+	var dadosAtualizados struct {
+		RazaoSocial *string `json:"razaosocial"`
+		Blocklist   *bool   `json:"blocklist"`
+	}
+
+	if err := c.ShouldBindJSON(&dadosAtualizados); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos, Algum parâmetro está vazio"})
+		return
+	}
+
+	if dadosAtualizados.RazaoSocial != nil {
+		cliente.RazaoSocial = *dadosAtualizados.RazaoSocial
+	}
+	if dadosAtualizados.Blocklist != nil {
+		cliente.Blocklist = *dadosAtualizados.Blocklist
+	}
+
+	if err := database.DB.Save(&cliente).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao atualizar cliente"})
+		return
+	}
+
+	c.JSON(http.StatusOK, cliente)
+
+}
+
 func Status(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"uptime":   "X segundos",    // Implemente a lógica de up-time
-		"requests": "X requisições", // Implemente a contagem de requisições
+		"uptime":   "X segundos",
+		"requests": "X requisições",
 	})
 }
