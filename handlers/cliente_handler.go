@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/Gileno29/clientes-API/database"
+	"github.com/Gileno29/clientes-API/middlewares"
 	"github.com/Gileno29/clientes-API/models"
 	"github.com/Gileno29/clientes-API/utils"
 
@@ -110,8 +112,13 @@ func AtualizaCliente(c *gin.Context) {
 }
 
 func Status(c *gin.Context) {
+
+	uptime := time.Since(utils.StartTime).Seconds()
+
+	requests := middlewares.GetRequestCount()
+
 	c.JSON(http.StatusOK, gin.H{
-		"uptime":   "X segundos",
-		"requests": "X requisições",
+		"uptime":   uptime,
+		"requests": requests,
 	})
 }

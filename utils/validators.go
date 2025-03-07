@@ -2,18 +2,16 @@ package utils
 
 import (
 	"strings"
+	"time"
 )
+
+var StartTime time.Time
 
 func ValidarCPF(cpf string) bool {
 	cpf = strings.ReplaceAll(cpf, ".", "")
 	cpf = strings.ReplaceAll(cpf, "-", "")
 
-	if len(cpf) != 11 {
-		return false
-	}
-
-	
-	return true
+	return len(cpf) == 11
 }
 
 func ValidarCNPJ(cnpj string) bool {
@@ -21,10 +19,6 @@ func ValidarCNPJ(cnpj string) bool {
 	cnpj = strings.ReplaceAll(cnpj, "-", "")
 	cnpj = strings.ReplaceAll(cnpj, "/", "")
 
-	if len(cnpj) != 14 {
-		return false
-	}
+	return len(cnpj) == 14
 
-	
-	return true
 }
