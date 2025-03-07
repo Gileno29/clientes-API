@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -46,15 +47,25 @@ func ListarClientes(c *gin.Context) {
 	var clientes []models.Cliente
 	query := database.DB
 
-	// Filtro por nome/razão social
 	if nome := c.Query("razao_social"); nome != "" {
 		query = query.Where("razao_social LIKE ?", "%"+nome+"%")
 	}
 
-	// Ordenação por nome
-	query.Order("razao_social asc").Find(&clientes)
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	offset := (page - 1) * limit
 
-	c.JSON(http.StatusOK, clientes)
+	var total int64
+	query.Model(&models.Cliente{}).Count(&total)
+
+	query.Order("razao_social asc").Offset(offset).Limit(limit).Find(&clientes)
+
+	c.JSON(http.StatusOK, gin.H{
+		"page":     page,
+		"limit":    limit,
+		"total":    total,
+		"clientes": clientes,
+	})
 }
 
 func VerificarCliente(c *gin.Context) {

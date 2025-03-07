@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type Cliente struct {
@@ -13,5 +11,4 @@ type Cliente struct {
 	Blocklist   bool   `gorm:"default:false"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	DeletedAt   gorm.DeletedAt `gorm:"index"`
 }
