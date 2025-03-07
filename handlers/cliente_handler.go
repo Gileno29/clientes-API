@@ -60,6 +60,11 @@ func ListarClientes(c *gin.Context) {
 func VerificarCliente(c *gin.Context) {
 	documento := c.Param("documento")
 
+	if !utils.ValidaDocumento(documento) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Documento inválido"})
+		return
+	}
+
 	var cliente models.Cliente
 	if err := database.DB.Where("documento = ?", documento).First(&cliente).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Cliente não encontrado"})
