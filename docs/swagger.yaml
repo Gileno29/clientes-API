@@ -1,0 +1,77 @@
+definitions:
+  handlers.ResponseCliente:
+    properties:
+      clientes:
+        items:
+          $ref: '#/definitions/models.Cliente'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  handlers.ResponseErro:
+    properties:
+      mensagem:
+        description: Mensagem de erro
+        type: string
+    type: object
+  models.Cliente:
+    properties:
+      blocklist:
+        type: boolean
+      createdAt:
+        type: string
+      documento:
+        description: gorm.Model
+        type: string
+      razaoSocial:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /clientes:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista de clientes com suporte a paginação e filtro
+        por nome/razão social
+      parameters:
+      - description: Filtrar por nome/razão social
+        in: query
+        name: razao_social
+        type: string
+      - default: 1
+        description: Número da página
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Número de itens por página
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Resposta com clientes paginados
+          schema:
+            $ref: '#/definitions/handlers.ResponseCliente'
+        "400":
+          description: Erro na requisição
+          schema:
+            $ref: '#/definitions/handlers.ResponseErro'
+        "500":
+          description: Erro interno do servidor
+          schema:
+            $ref: '#/definitions/handlers.ResponseErro'
+      summary: Lista todos os clientes com paginação
+      tags:
+      - clientes
+swagger: "2.0"

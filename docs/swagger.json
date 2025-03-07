@@ -1,0 +1,117 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/clientes": {
+            "get": {
+                "description": "Retorna uma lista de clientes com suporte a paginação e filtro por nome/razão social",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clientes"
+                ],
+                "summary": "Lista todos os clientes com paginação",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filtrar por nome/razão social",
+                        "name": "razao_social",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Número da página",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Número de itens por página",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resposta com clientes paginados",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ResponseCliente"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro na requisição",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ResponseErro"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.ResponseErro"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.ResponseCliente": {
+            "type": "object",
+            "properties": {
+                "clientes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Cliente"
+                    }
+                },
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handlers.ResponseErro": {
+            "type": "object",
+            "properties": {
+                "mensagem": {
+                    "description": "Mensagem de erro",
+                    "type": "string"
+                }
+            }
+        },
+        "models.Cliente": {
+            "type": "object",
+            "properties": {
+                "blocklist": {
+                    "type": "boolean"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "documento": {
+                    "description": "gorm.Model",
+                    "type": "string"
+                },
+                "razaoSocial": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
