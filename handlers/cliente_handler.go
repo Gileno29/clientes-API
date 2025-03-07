@@ -18,31 +18,56 @@ import (
 func CadastrarCliente(c *gin.Context) {
 	var cliente models.Cliente
 	if err := c.ShouldBindJSON(&cliente); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		erro := ResponseErro{
+			Mensagem: "{'error':" + err.Error() + "}",
+		}
+		c.JSON(http.StatusBadRequest, erro)
 		return
 	}
 
 	// Valida CPF/CNPJ
 	if !utils.ValidaDocumento(cliente.Documento) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Documento inválido"})
+		erro := ResponseErro{
+			Mensagem: "{'error': 'Documento inválido'}",
+		}
+		c.JSON(http.StatusBadRequest, erro)
 		return
 	}
 
 	// Verifica se o cliente já existe
 	var existingCliente models.Cliente
 	if err := database.DB.Where("documento = ?", cliente.Documento).First(&existingCliente).Error; err == nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "Cliente já cadastrado"})
+		erro := ResponseErro{
+			Mensagem: "{'error': 'Cliente já cadastrado'}",
+		}
+		c.JSON(http.StatusConflict, erro)
 		return
 	}
 
 	if err := database.DB.Create(&cliente).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao cadastrar cliente"})
+		erro := ResponseErro{
+			Mensagem: "{'error': 'Erro ao cadastrar cliente'}",
+		}
+		c.JSON(http.StatusInternalServerError, erro)
 		return
 	}
 
 	c.JSON(http.StatusCreated, cliente)
 }
 
+// ListarClientes godoc
+// @Summary Lista todos os clientes com paginação
+// @Description Retorna uma lista de clientes com suporte a paginação e filtro por nome/razão social
+// @Tags clientes
+// @Accept json
+// @Produce json
+// @Param razao_social query string false "Filtrar por nome/razão social"
+// @Param page query int false "Número da página" default(1)
+// @Param limit query int false "Número de itens por página" default(10)
+// @Success 200 {object} ResponseCliente "Resposta com clientes paginados"
+// @Failure 400 {object} ResponseErro "Erro na requisição"
+// @Failure 500 {object} ResponseErro "Erro interno do servidor"
+// @Router /clientes [get]
 func ListarClientes(c *gin.Context) {
 	var clientes []models.Cliente
 	query := database.DB
@@ -60,25 +85,34 @@ func ListarClientes(c *gin.Context) {
 
 	query.Order("razao_social asc").Offset(offset).Limit(limit).Find(&clientes)
 
-	c.JSON(http.StatusOK, gin.H{
-		"page":     page,
-		"limit":    limit,
-		"total":    total,
-		"clientes": clientes,
-	})
+	resposta := ResponseCliente{
+		Page:     page,
+		Limit:    limit,
+		Total:    total,
+		Clientes: clientes,
+	}
+
+	c.JSON(http.StatusOK, resposta)
 }
 
 func VerificarCliente(c *gin.Context) {
 	documento := c.Param("documento")
 
 	if !utils.ValidaDocumento(documento) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Documento inválido"})
+		erro := ResponseErro{
+			Mensagem: "{'error': 'Documento inválido'}",
+		}
+
+		c.JSON(http.StatusBadRequest, erro)
 		return
 	}
 
 	var cliente models.Cliente
 	if err := database.DB.Where("documento = ?", documento).First(&cliente).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Cliente não encontrado"})
+		erro := ResponseErro{
+			Mensagem: "{'error': 'Cliente não encontrado'}",
+		}
+		c.JSON(http.StatusNotFound, erro)
 		return
 	}
 
@@ -97,7 +131,10 @@ func AtualizaCliente(c *gin.Context) {
 	var cliente models.Cliente
 	if err := database.DB.Where("documento = ?", documento).First(&cliente).Error; err != nil {
 		fmt.Println("Erro ao buscar cliente", err)
-		c.JSON(http.StatusConflict, gin.H{"error": "Cliente Não identificado"})
+		erro := ResponseErro{
+			Mensagem: "{'error': 'Cliente Não identificado'}",
+		}
+		c.JSON(http.StatusConflict, erro)
 		return
 	}
 
@@ -107,7 +144,10 @@ func AtualizaCliente(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&dadosAtualizados); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos, Algum parâmetro está vazio"})
+		erro := ResponseErro{
+			Mensagem: "{'error': 'Dados inválidos, Algum parâmetro está vazio'}",
+		}
+		c.JSON(http.StatusBadRequest, erro)
 		return
 	}
 
@@ -119,7 +159,10 @@ func AtualizaCliente(c *gin.Context) {
 	}
 
 	if err := database.DB.Save(&cliente).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao atualizar cliente"})
+		erro := ResponseErro{
+			Mensagem: "{'error': 'Erro ao atualizar cliente'}",
+		}
+		c.JSON(http.StatusInternalServerError, erro)
 		return
 	}
 
@@ -129,12 +172,13 @@ func AtualizaCliente(c *gin.Context) {
 
 func Status(c *gin.Context) {
 
-	uptime := time.Since(utils.StartTime).Seconds()
+	//uptime := time.Since(utils.StartTime).Seconds()
 
-	requests := middlewares.GetRequestCount()
+	//requests := middlewares.GetRequestCount()
 
-	c.JSON(http.StatusOK, gin.H{
-		"uptime":   uptime,
-		"requests": requests,
-	})
+	status := ResponseStatus{
+		Uptime:   time.Since(utils.StartTime).Seconds(),
+		Requests: middlewares.GetRequestCount(),
+	}
+	c.JSON(http.StatusOK, status)
 }
