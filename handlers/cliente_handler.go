@@ -22,7 +22,7 @@ func CadastrarCliente(c *gin.Context) {
 	}
 
 	// Valida CPF/CNPJ
-	if !utils.ValidarCPF(cliente.Documento) && !utils.ValidarCNPJ(cliente.Documento) {
+	if !utils.ValidaDocumento(cliente.Documento) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Documento inválido"})
 		return
 	}

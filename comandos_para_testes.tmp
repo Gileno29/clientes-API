@@ -1,5 +1,5 @@
 curl -X POST http://localhost:8080/clientes -H "Content-Type: application/json" -d '{
-  "documento": "12345678901",
+  "documento": "00045678000",
   "razaosocial": "João Silva",
   "blocklist": false
 }'
@@ -38,3 +38,6 @@ curl -X PUT http://localhost:8080/clientes/12345678901 \
 curl -X PUT http://localhost:8080/clientes/12345678901 \
 -H "Content-Type: application/json" \
 -d '{}'
+
+# consultar status
+curl localhost:8080/status
