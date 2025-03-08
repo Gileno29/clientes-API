@@ -41,3 +41,6 @@ curl -X PUT http://localhost:8080/clientes/12345678901 \
 
 # consultar status
 curl localhost:8080/status
+
+# Deletar clientes
+curl -X DELETE http://localhost:8080/clientes/12345678901

@@ -1,9 +1,25 @@
 definitions:
-  handlers.ResponseCliente:
+  dtos.AtualizaClienteRequest:
+    properties:
+      blocklist:
+        type: boolean
+      razaosocial:
+        type: string
+    type: object
+  dtos.ClienteResponse:
+    properties:
+      blocklist:
+        type: boolean
+      documento:
+        type: string
+      razaosocial:
+        type: string
+    type: object
+  dtos.ListarClientesResponse:
     properties:
       clientes:
         items:
-          $ref: '#/definitions/models.Cliente'
+          $ref: '#/definitions/dtos.ClienteResponse'
         type: array
       limit:
         type: integer
@@ -12,24 +28,21 @@ definitions:
       total:
         type: integer
     type: object
-  handlers.ResponseErro:
+  dtos.ResponseErro:
     properties:
       mensagem:
-        description: Mensagem de erro
         type: string
     type: object
-  models.Cliente:
+  dtos.ResponseStatus:
     properties:
-      blocklist:
-        type: boolean
-      createdAt:
-        type: string
-      documento:
-        description: gorm.Model
-        type: string
-      razaoSocial:
-        type: string
-      updatedAt:
+      requests:
+        type: integer
+      uptime:
+        type: number
+    type: object
+  dtos.ResponseSucesso:
+    properties:
+      mensagem:
         type: string
     type: object
 info:
@@ -62,16 +75,137 @@ paths:
         "200":
           description: Resposta com clientes paginados
           schema:
-            $ref: '#/definitions/handlers.ResponseCliente'
+            $ref: '#/definitions/dtos.ListarClientesResponse'
         "400":
           description: Erro na requisição
           schema:
-            $ref: '#/definitions/handlers.ResponseErro'
+            $ref: '#/definitions/dtos.ResponseErro'
         "500":
           description: Erro interno do servidor
           schema:
-            $ref: '#/definitions/handlers.ResponseErro'
+            $ref: '#/definitions/dtos.ResponseErro'
       summary: Lista todos os clientes com paginação
       tags:
       - clientes
+  /clientes/{documento}:
+    delete:
+      consumes:
+      - application/json
+      description: Deleta um cliente com base no documento (CPF/CNPJ) fornecido.
+      parameters:
+      - description: Documento do cliente (CPF/CNPJ)
+        in: path
+        name: documento
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Cliente deletado com sucesso
+          schema:
+            $ref: '#/definitions/dtos.ResponseSucesso'
+        "400":
+          description: Documento inválido
+          schema:
+            $ref: '#/definitions/dtos.ResponseErro'
+        "404":
+          description: Cliente não encontrado
+          schema:
+            $ref: '#/definitions/dtos.ResponseErro'
+        "500":
+          description: Erro ao deletar cliente
+          schema:
+            $ref: '#/definitions/dtos.ResponseErro'
+      summary: Deleta um cliente
+      tags:
+      - clientes
+    get:
+      consumes:
+      - application/json
+      description: Verifica se um cliente com o documento (CPF/CNPJ) fornecido está
+        cadastrado na base de dados.
+      parameters:
+      - description: Documento do cliente (CPF/CNPJ)
+        in: path
+        name: documento
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Cliente encontrado
+          schema:
+            $ref: '#/definitions/dtos.ClienteResponse'
+        "400":
+          description: Documento inválido
+          schema:
+            $ref: '#/definitions/dtos.ResponseErro'
+        "404":
+          description: Cliente não encontrado
+          schema:
+            $ref: '#/definitions/dtos.ResponseErro'
+      summary: Verifica se um cliente está cadastrado
+      tags:
+      - clientes
+    put:
+      consumes:
+      - application/json
+      description: Atualiza a razão social e/ou o status de blocklist de um cliente
+        com base no documento (CPF/CNPJ) fornecido.
+      parameters:
+      - description: Documento do cliente (CPF/CNPJ)
+        in: path
+        name: documento
+        required: true
+        type: string
+      - description: Dados para atualização
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.AtualizaClienteRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Cliente atualizado com sucesso
+          schema:
+            $ref: '#/definitions/dtos.ClienteResponse'
+        "400":
+          description: Dados inválidos ou parâmetros vazios
+          schema:
+            $ref: '#/definitions/dtos.ResponseErro'
+        "404":
+          description: Cliente não encontrado
+          schema:
+            $ref: '#/definitions/dtos.ResponseErro'
+        "409":
+          description: Cliente não identificado
+          schema:
+            $ref: '#/definitions/dtos.ResponseErro'
+        "500":
+          description: Erro ao atualizar cliente
+          schema:
+            $ref: '#/definitions/dtos.ResponseErro'
+      summary: Atualiza os dados de um cliente
+      tags:
+      - clientes
+  /status:
+    get:
+      consumes:
+      - application/json
+      description: Retorna informações sobre o tempo de atividade (uptime) e o número
+        de requisições atendidas.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Status do servidor
+          schema:
+            $ref: '#/definitions/dtos.ResponseStatus'
+      summary: Retorna o status do servidor
+      tags:
+      - status
 swagger: "2.0"

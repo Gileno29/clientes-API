@@ -43,19 +43,197 @@
                     "200": {
                         "description": "Resposta com clientes paginados",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ResponseCliente"
+                            "$ref": "#/definitions/dtos.ListarClientesResponse"
                         }
                     },
                     "400": {
                         "description": "Erro na requisição",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ResponseErro"
+                            "$ref": "#/definitions/dtos.ResponseErro"
                         }
                     },
                     "500": {
                         "description": "Erro interno do servidor",
                         "schema": {
-                            "$ref": "#/definitions/handlers.ResponseErro"
+                            "$ref": "#/definitions/dtos.ResponseErro"
+                        }
+                    }
+                }
+            }
+        },
+        "/clientes/{documento}": {
+            "get": {
+                "description": "Verifica se um cliente com o documento (CPF/CNPJ) fornecido está cadastrado na base de dados.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clientes"
+                ],
+                "summary": "Verifica se um cliente está cadastrado",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Documento do cliente (CPF/CNPJ)",
+                        "name": "documento",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cliente encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ClienteResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Documento inválido",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ResponseErro"
+                        }
+                    },
+                    "404": {
+                        "description": "Cliente não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ResponseErro"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Atualiza a razão social e/ou o status de blocklist de um cliente com base no documento (CPF/CNPJ) fornecido.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clientes"
+                ],
+                "summary": "Atualiza os dados de um cliente",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Documento do cliente (CPF/CNPJ)",
+                        "name": "documento",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados para atualização",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.AtualizaClienteRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cliente atualizado com sucesso",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ClienteResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Dados inválidos ou parâmetros vazios",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ResponseErro"
+                        }
+                    },
+                    "404": {
+                        "description": "Cliente não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ResponseErro"
+                        }
+                    },
+                    "409": {
+                        "description": "Cliente não identificado",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ResponseErro"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao atualizar cliente",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ResponseErro"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deleta um cliente com base no documento (CPF/CNPJ) fornecido.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clientes"
+                ],
+                "summary": "Deleta um cliente",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Documento do cliente (CPF/CNPJ)",
+                        "name": "documento",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cliente deletado com sucesso",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ResponseSucesso"
+                        }
+                    },
+                    "400": {
+                        "description": "Documento inválido",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ResponseErro"
+                        }
+                    },
+                    "404": {
+                        "description": "Cliente não encontrado",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ResponseErro"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro ao deletar cliente",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ResponseErro"
+                        }
+                    }
+                }
+            }
+        },
+        "/status": {
+            "get": {
+                "description": "Retorna informações sobre o tempo de atividade (uptime) e o número de requisições atendidas.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "status"
+                ],
+                "summary": "Retorna o status do servidor",
+                "responses": {
+                    "200": {
+                        "description": "Status do servidor",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ResponseStatus"
                         }
                     }
                 }
@@ -63,13 +241,38 @@
         }
     },
     "definitions": {
-        "handlers.ResponseCliente": {
+        "dtos.AtualizaClienteRequest": {
+            "type": "object",
+            "properties": {
+                "blocklist": {
+                    "type": "boolean"
+                },
+                "razaosocial": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.ClienteResponse": {
+            "type": "object",
+            "properties": {
+                "blocklist": {
+                    "type": "boolean"
+                },
+                "documento": {
+                    "type": "string"
+                },
+                "razaosocial": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.ListarClientesResponse": {
             "type": "object",
             "properties": {
                 "clientes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.Cliente"
+                        "$ref": "#/definitions/dtos.ClienteResponse"
                     }
                 },
                 "limit": {
@@ -83,32 +286,29 @@
                 }
             }
         },
-        "handlers.ResponseErro": {
+        "dtos.ResponseErro": {
             "type": "object",
             "properties": {
                 "mensagem": {
-                    "description": "Mensagem de erro",
                     "type": "string"
                 }
             }
         },
-        "models.Cliente": {
+        "dtos.ResponseStatus": {
             "type": "object",
             "properties": {
-                "blocklist": {
-                    "type": "boolean"
+                "requests": {
+                    "type": "integer"
                 },
-                "createdAt": {
-                    "type": "string"
-                },
-                "documento": {
-                    "description": "gorm.Model",
-                    "type": "string"
-                },
-                "razaoSocial": {
-                    "type": "string"
-                },
-                "updatedAt": {
+                "uptime": {
+                    "type": "number"
+                }
+            }
+        },
+        "dtos.ResponseSucesso": {
+            "type": "object",
+            "properties": {
+                "mensagem": {
                     "type": "string"
                 }
             }
