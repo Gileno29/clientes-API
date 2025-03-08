@@ -19,7 +19,39 @@ func Connect() {
 		log.Fatal("Erro ao carregar o arquivo .env: ", err)
 	}
 
-	conectioString := "user=" + os.Getenv("POSTGRES_USER") + " dbname=" + os.Getenv("POSTGRES_DB") + " password=" + os.Getenv("POSTGRES_PASSWORD") + " host=" + os.Getenv("DATABASE_HOST") + " sslmode=disable"
+	var (
+		user     string
+		password string
+		dbname   string
+		host     string
+	)
+
+	env := os.Getenv("ENVIRONMENT")
+	if env == "" {
+		log.Fatal("Variável de ambiente 'ENVIRONMENT' não definida")
+	}
+
+	switch env {
+	case "development":
+		user = os.Getenv("DEV_POSTGRES_USER")
+		password = os.Getenv("DEV_POSTGRES_PASSWORD")
+		dbname = os.Getenv("DEV_POSTGRES_DB")
+		host = os.Getenv("DEV_DATABASE_HOST")
+	case "test":
+		user = os.Getenv("TEST_POSTGRES_USER")
+		password = os.Getenv("TEST_POSTGRES_PASSWORD")
+		dbname = os.Getenv("TEST_POSTGRES_DB")
+		host = os.Getenv("TEST_DATABASE_HOST")
+	case "production":
+		user = os.Getenv("PROD_POSTGRES_USER")
+		password = os.Getenv("PROD_POSTGRES_PASSWORD")
+		dbname = os.Getenv("PROD_POSTGRES_DB")
+		host = os.Getenv("PROD_DATABASE_HOST")
+	default:
+		log.Fatalf("Ambiente desconhecido: %s", env)
+	}
+
+	conectioString := "user=" + user + " dbname=" + dbname + " password=" + password + " host=" + host + " sslmode=disable"
 	fmt.Println(conectioString)
 	db, err := gorm.Open(postgres.Open(conectioString), &gorm.Config{})
 
