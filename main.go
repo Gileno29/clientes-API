@@ -31,5 +31,6 @@ func main() {
 	r.GET("/clientes/:documento", handlers.VerificarCliente)
 	r.GET("/status", handlers.Status)
 	r.PUT("/clientes/:documento", handlers.AtualizaCliente)
+	r.DELETE("/clientes/:documento", handlers.DeletarCliente)
 	r.Run(":8080")
 }
