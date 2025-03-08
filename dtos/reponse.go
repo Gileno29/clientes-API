@@ -22,6 +22,10 @@ type ResponseErro struct {
 	Mensagem string `json:"mensagem"`
 }
 
+type ResponseSucesso struct {
+	Mensagem string `json:"mensagem"`
+}
+
 type AtualizaClienteRequest struct {
 	RazaoSocial *string `json:"razaosocial"`
 	Blocklist   *bool   `json:"blocklist"`
