@@ -59,6 +59,56 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "description": "Cadastra um novo cliente no sistema com base nos dados fornecidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "clientes"
+                ],
+                "summary": "Cadastra um novo cliente",
+                "parameters": [
+                    {
+                        "description": "Dados do cliente a ser cadastrado",
+                        "name": "cliente",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ClienteResponse"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Cliente cadastrado com sucesso",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ClienteResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Erro ao processar a requisição (ex: documento inválido ou JSON inválido)",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ResponseErro"
+                        }
+                    },
+                    "409": {
+                        "description": "Cliente já cadastrado",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ResponseErro"
+                        }
+                    },
+                    "500": {
+                        "description": "Erro interno ao cadastrar o cliente",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ResponseErro"
+                        }
+                    }
+                }
             }
         },
         "/clientes/{documento}": {
@@ -226,7 +276,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "status"
+                    "suporte"
                 ],
                 "summary": "Retorna o status do servidor",
                 "responses": {

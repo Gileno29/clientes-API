@@ -16,6 +16,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary Cadastra um novo cliente
+// @Description Cadastra um novo cliente no sistema com base nos dados fornecidos.
+// @Tags clientes
+// @Accept json
+// @Produce json
+// @Param cliente body dtos.ClienteResponse true "Dados do cliente a ser cadastrado"
+// @Success 201 {object} dtos.ClienteResponse "Cliente cadastrado com sucesso"
+// @Failure 400 {object} dtos.ResponseErro "Erro ao processar a requisição (ex: documento inválido ou JSON inválido)"
+// @Failure 409 {object} dtos.ResponseErro "Cliente já cadastrado"
+// @Failure 500 {object} dtos.ResponseErro "Erro interno ao cadastrar o cliente"
+// @Router /clientes [post]
 func CadastrarCliente(c *gin.Context) {
 	var cliente models.Cliente
 	if err := c.ShouldBindJSON(&cliente); err != nil {
@@ -53,7 +64,13 @@ func CadastrarCliente(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, cliente)
+	response := dtos.ClienteResponse{
+		Documento:   cliente.Documento,
+		RazaoSocial: cliente.RazaoSocial,
+		Blocklist:   cliente.Blocklist,
+	}
+
+	c.JSON(http.StatusCreated, response)
 }
 
 // ListarClientes godoc
@@ -290,7 +307,7 @@ func DeletarCliente(c *gin.Context) {
 // Status godoc
 // @Summary Retorna o status do servidor
 // @Description Retorna informações sobre o tempo de atividade (uptime) e o número de requisições atendidas.
-// @Tags status
+// @Tags suporte
 // @Accept json
 // @Produce json
 // @Success 200 {object} dtos.ResponseStatus "Status do servidor"
