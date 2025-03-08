@@ -183,7 +183,15 @@ func AtualizaCliente(c *gin.Context) {
 	documento = strings.ReplaceAll(documento, "/", "")
 	documento = strings.TrimSpace(documento)
 
-	fmt.Println("Esse é meu documento ", documento)
+	if !utils.ValidaDocumento(documento) {
+		erro := dtos.ResponseErro{
+			Mensagem: "{'error': 'Documento inválido'}",
+		}
+
+		c.JSON(http.StatusBadRequest, erro)
+		return
+	}
+
 	var cliente models.Cliente
 	if err := database.DB.Where("documento = ?", documento).First(&cliente).Error; err != nil {
 		fmt.Println("Erro ao buscar cliente", err)
@@ -203,7 +211,7 @@ func AtualizaCliente(c *gin.Context) {
 		return
 	}
 
-	if dadosAtualizados.RazaoSocial != nil {
+	if dadosAtualizados.RazaoSocial != nil && *dadosAtualizados.RazaoSocial != "" && *dadosAtualizados.RazaoSocial != " " {
 		cliente.RazaoSocial = *dadosAtualizados.RazaoSocial
 	}
 	if dadosAtualizados.Blocklist != nil {
