@@ -183,7 +183,6 @@ func AtualizaCliente(c *gin.Context) {
 	documento = strings.ReplaceAll(documento, "/", "")
 	documento = strings.TrimSpace(documento)
 
-	fmt.Println("Esse é meu documento ", documento)
 	var cliente models.Cliente
 	if err := database.DB.Where("documento = ?", documento).First(&cliente).Error; err != nil {
 		fmt.Println("Erro ao buscar cliente", err)

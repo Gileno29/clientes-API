@@ -1,10 +1,11 @@
 package utils
 
 import (
+	"log"
 	"testing"
-	"time"
-	"github.com/stretchr/testify/assert"
+
 	"github.com/Gileno29/clientes-API/models"
+	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -25,7 +26,6 @@ func TestValidaDocumento(t *testing.T) {
 	assert.False(t, ValidaDocumento("1234567890123"), "CNPJ com menos de 14 dígitos")
 }
 
-
 func TestValidarCPF(t *testing.T) {
 	assert.True(t, ValidarCPF("52998224725"), "CPF válido")
 	assert.False(t, ValidarCPF("52998224726"), "CPF inválido")
@@ -40,25 +40,27 @@ func TestValidarCNPJ(t *testing.T) {
 	assert.False(t, ValidarCNPJ("1234567890123"), "CNPJ com menos de 14 dígitos")
 }
 
-
 func TestCalcularDigitoVerificador(t *testing.T) {
-	assert.Equal(t, 5, calcularDigitoVerificador("529982247", 10), "Cálculo do primeiro dígito verificador do CPF")
-	assert.Equal(t, 2, calcularDigitoVerificador("5299822472", 11), "Cálculo do segundo dígito verificador do CPF")
-}
+	// Teste para o primeiro dígito verificador do CPF
+	// Para o CPF "123456789", o primeiro dígito verificador é 0
+	primeiroDigito := calcularDigitoVerificador("123456789", 10)
+	assert.Equal(t, 0, primeiroDigito, "Cálculo do primeiro dígito verificador do CPF")
 
+	// Teste para o segundo dígito verificador do CPF
+	// Para o CPF "1234567890", o segundo dígito verificador é 9
+	segundoDigito := calcularDigitoVerificador("1234567890", 11)
+	assert.Equal(t, 9, segundoDigito, "Cálculo do segundo dígito verificador do CPF")
+}
 
 func TestCalcularDigitoVerificadorCNPJ(t *testing.T) {
 	assert.Equal(t, 0, calcularDigitoVerificadorCNPJ("330001670001", []int{5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}), "Cálculo do primeiro dígito verificador do CNPJ")
 	assert.Equal(t, 1, calcularDigitoVerificadorCNPJ("3300016700010", []int{6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}), "Cálculo do segundo dígito verificador do CNPJ")
 }
 
-
-
 func TestTodosDigitosIguais(t *testing.T) {
 	assert.True(t, todosDigitosIguais("11111111111"), "Todos os dígitos iguais")
 	assert.False(t, todosDigitosIguais("12345678901"), "Dígitos diferentes")
 }
-
 
 // setupDB inicializa um banco de dados SQLite em memória para testes
 func setupDB() *gorm.DB {

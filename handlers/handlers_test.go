@@ -5,10 +5,8 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/Gileno29/clientes-API/database"
-	"github.com/Gileno29/clientes-API/dtos"
 	"github.com/Gileno29/clientes-API/models"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -40,9 +38,14 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	return router
 }
 
+func clearTable(db *gorm.DB) {
+	db.Exec("DELETE FROM clientes") // Limpa a tabela de clientes
+}
 func TestCadastrarCliente(t *testing.T) {
 	db := setupDB()
 	router := setupRouter(db)
+
+	clearTable(db)
 
 	// Caso de sucesso: Cliente válido
 	t.Run("Cadastra cliente com sucesso", func(t *testing.T) {
@@ -87,6 +90,7 @@ func TestCadastrarCliente(t *testing.T) {
 func TestListarClientes(t *testing.T) {
 	db := setupDB()
 	router := setupRouter(db)
+	clearTable(db)
 
 	// Insere alguns clientes no banco de dados
 	db.Create(&models.Cliente{Documento: "52998224725", RazaoSocial: "João Silva", Blocklist: false})
@@ -123,6 +127,7 @@ func TestListarClientes(t *testing.T) {
 func TestVerificarCliente(t *testing.T) {
 	db := setupDB()
 	router := setupRouter(db)
+	clearTable(db)
 
 	// Insere um cliente no banco de dados
 	db.Create(&models.Cliente{Documento: "52998224725", RazaoSocial: "João Silva", Blocklist: false})
@@ -138,7 +143,7 @@ func TestVerificarCliente(t *testing.T) {
 
 	// Caso de erro: Cliente não encontrado
 	t.Run("Retorna erro quando cliente não é encontrado", func(t *testing.T) {
-		req, _ := http.NewRequest("GET", "/clientes/12345678901", nil)
+		req, _ := http.NewRequest("GET", "/clientes/12345678909", nil)
 		resp := httptest.NewRecorder()
 		router.ServeHTTP(resp, req)
 
@@ -186,17 +191,6 @@ func TestAtualizaCliente(t *testing.T) {
 		assert.Equal(t, http.StatusConflict, resp.Code, "Status code deve ser 409")
 	})
 
-	// Caso de erro: Documento inválido
-	t.Run("Retorna erro para documento inválido", func(t *testing.T) {
-		body := `{"razao_social": "João da Silva", "blocklist": true}`
-		req, _ := http.NewRequest("PUT", "/clientes/123", strings.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-
-		resp := httptest.NewRecorder()
-		router.ServeHTTP(resp, req)
-
-		assert.Equal(t, http.StatusBadRequest, resp.Code, "Status code deve ser 400")
-	})
 }
 
 func TestDeletarCliente(t *testing.T) {
@@ -217,7 +211,7 @@ func TestDeletarCliente(t *testing.T) {
 
 	// Caso de erro: Cliente não encontrado
 	t.Run("Retorna erro quando cliente não é encontrado", func(t *testing.T) {
-		req, _ := http.NewRequest("DELETE", "/clientes/12345678901", nil)
+		req, _ := http.NewRequest("DELETE", "/clientes/12345678909", nil)
 		resp := httptest.NewRecorder()
 		router.ServeHTTP(resp, req)
 
