@@ -8,6 +8,7 @@ import (
 
 	"github.com/Gileno29/clientes-API/database"
 	"github.com/Gileno29/clientes-API/models"
+	"github.com/Gileno29/clientes-API/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
@@ -28,8 +29,11 @@ func setupDB() *gorm.DB {
 // setupRouter inicializa o router do Gin com os handlers de teste
 func setupRouter(db *gorm.DB) *gin.Engine {
 	database.DB = db
+	clienteRepo := repository.NewClienteRepository(db)
+	clienteHandler := NewClienteHandler(clienteRepo)
+
 	router := gin.Default()
-	router.POST("/clientes", CadastrarCliente)
+	router.POST("/clientes", clienteHandler.CadastrarCliente)
 	router.GET("/clientes", ListarClientes)
 	router.GET("/clientes/:documento", VerificarCliente)
 	router.PUT("/clientes/:documento", AtualizaCliente)

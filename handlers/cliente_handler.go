@@ -11,10 +11,19 @@ import (
 	"github.com/Gileno29/clientes-API/dtos"
 	"github.com/Gileno29/clientes-API/middlewares"
 	"github.com/Gileno29/clientes-API/models"
+	"github.com/Gileno29/clientes-API/repository"
 	"github.com/Gileno29/clientes-API/utils"
 
 	"github.com/gin-gonic/gin"
 )
+
+type ClienteHandler struct {
+	repo repository.ClienteRepository
+}
+
+func NewClienteHandler(repo repository.ClienteRepository) *ClienteHandler {
+	return &ClienteHandler{repo: repo}
+}
 
 // @Summary Cadastra um novo cliente
 // @Description Cadastra um novo cliente no sistema com base nos dados fornecidos.
@@ -27,8 +36,9 @@ import (
 // @Failure 409 {object} dtos.ResponseErro "Cliente já cadastrado"
 // @Failure 500 {object} dtos.ResponseErro "Erro interno ao cadastrar o cliente"
 // @Router /clientes [post]
-func CadastrarCliente(c *gin.Context) {
+func (h *ClienteHandler) CadastrarCliente(c *gin.Context) {
 	var cliente models.Cliente
+
 	if err := c.ShouldBindJSON(&cliente); err != nil {
 		erro := dtos.ResponseErro{
 			Mensagem: "{'error':" + err.Error() + "}",
@@ -47,8 +57,9 @@ func CadastrarCliente(c *gin.Context) {
 	}
 
 	// Verifica se o cliente já existe
-	var existingCliente models.Cliente
-	if err := database.DB.Where("documento = ?", cliente.Documento).First(&existingCliente).Error; err == nil {
+	existingCliente, err := h.repo.FindByDocumento(cliente.Documento)
+
+	if err == nil && existingCliente != nil {
 		erro := dtos.ResponseErro{
 			Mensagem: "{'error': 'Cliente já cadastrado'}",
 		}
@@ -56,7 +67,7 @@ func CadastrarCliente(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Create(&cliente).Error; err != nil {
+	if err := h.repo.Create(&cliente); err != nil {
 		erro := dtos.ResponseErro{
 			Mensagem: "{'error': 'Erro ao cadastrar cliente'}",
 		}
