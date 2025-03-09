@@ -83,7 +83,7 @@ docker-compose up -d  --build #rodar em backgroud
 ```
 *Obs:* Verifique se já possui serviços funcionando em sua máquina nas portas da aplicação, caso haja, desative-os.
 
-Seguindo a ordem corretamente, o sistema deve iniciar e estar acessível no endereço: http://localhost:8080/clientes
+Seguindo a ordem corretamente, a API vai estar acessível no endpoint: http://localhost:8080/clientes
 
 
 ## Utilização API de Clientes
@@ -97,7 +97,7 @@ Esta API gerencia clientes de uma empresa fictícia.
 
 Opcionalmente a  documentção interativa contida nesse arquivo é possivel utilizar a documentação criada com o swagger.
 no seguinte end point:
-- **URL**: `/swagger/index.html`
+- **URL**: `localhost:8080/swagger/index.html`
 
 <img src="https://github.com/Gileno29/clientes-API/blob/main/doc_img/image.png"/>
 
