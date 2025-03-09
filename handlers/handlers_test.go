@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/Gileno29/clientes-API/database"
+	"github.com/Gileno29/clientes-API/mocks"
 	_ "github.com/Gileno29/clientes-API/mocks"
 	"github.com/Gileno29/clientes-API/models"
 	"github.com/Gileno29/clientes-API/repository"
@@ -212,7 +213,7 @@ func TestAtualizaCliente(t *testing.T) {
 	t.Run("Retorna erro ao atualizar cliente no banco de dados", func(t *testing.T) {
 		// Simula um erro no repository (ex: banco de dados indisponível)
 		// Aqui você pode usar um mock do repository para forçar um erro
-		mockRepo := new(MockClienteRepository)
+		mockRepo := new(mocks.MockClienteRepository)
 		mockRepo.On("UpdateByDocumento", mock.Anything, mock.Anything).Return(nil, errors.New("erro ao atualizar cliente"))
 
 		handler := NewClienteHandler(mockRepo)
