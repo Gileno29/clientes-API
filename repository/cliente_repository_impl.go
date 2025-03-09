@@ -2,6 +2,7 @@
 package repository
 
 import (
+	"github.com/Gileno29/clientes-API/dtos"
 	"github.com/Gileno29/clientes-API/models"
 	"gorm.io/gorm"
 )
@@ -27,24 +28,26 @@ func (r *clienteRepository) FindByDocumento(documento string) (*models.Cliente, 
 	return &cliente, nil
 }
 
-// UpdateByDocumento atualiza um cliente pelo documento
-func (r *clienteRepository) UpdateByDocumento(documento string, cliente *models.Cliente) error {
-	// Busca o cliente existente
-	var existingCliente models.Cliente
-	if err := r.db.Where("documento = ?", documento).First(&existingCliente).Error; err != nil {
-		return err // Retorna erro se o cliente não for encontrado
+func (r *clienteRepository) UpdateByDocumento(documento string, dadosAtualizados *dtos.AtualizaClienteRequest) (*models.Cliente, error) {
+	// Busca o cliente pelo documento
+	var cliente models.Cliente
+	if err := r.db.Where("documento = ?", documento).First(&cliente).Error; err != nil {
+		return nil, err // Retorna erro se o cliente não for encontrado
 	}
 
-	// Atualiza os campos do cliente existente
-	if cliente.RazaoSocial != "" {
-		existingCliente.RazaoSocial = cliente.RazaoSocial
+	// Atualiza os campos do cliente
+	if dadosAtualizados.RazaoSocial != nil && *dadosAtualizados.RazaoSocial != "" && *dadosAtualizados.RazaoSocial != " " {
+		cliente.RazaoSocial = *dadosAtualizados.RazaoSocial
 	}
-	if cliente.Blocklist != existingCliente.Blocklist {
-		existingCliente.Blocklist = cliente.Blocklist
+	if dadosAtualizados.Blocklist != nil {
+		cliente.Blocklist = *dadosAtualizados.Blocklist
 	}
 
-	// Salva as alterações no banco de dados
-	return r.db.Save(&existingCliente).Error
+	if err := r.db.Save(&cliente).Error; err != nil {
+		return nil, err
+	}
+
+	return &cliente, nil
 }
 
 // DeleteByDocumento remove um cliente pelo documento

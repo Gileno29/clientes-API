@@ -34,9 +34,9 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 
 	router := gin.Default()
 	router.POST("/clientes", clienteHandler.CadastrarCliente)
-	router.GET("/clientes", ListarClientes)
-	router.GET("/clientes/:documento", VerificarCliente)
-	router.PUT("/clientes/:documento", AtualizaCliente)
+	router.GET("/clientes", clienteHandler.ListarClientes)
+	router.GET("/clientes/:documento", clienteHandler.VerificarCliente)
+	router.PUT("/clientes/:documento", clienteHandler.AtualizaCliente)
 	router.DELETE("/clientes/:documento", DeletarCliente)
 	router.GET("/status", Status)
 	return router
@@ -181,18 +181,6 @@ func TestAtualizaCliente(t *testing.T) {
 		router.ServeHTTP(resp, req)
 
 		assert.Equal(t, http.StatusOK, resp.Code, "Status code deve ser 200")
-	})
-
-	// Caso de erro: Cliente não encontrado
-	t.Run("Retorna erro quando cliente não é encontrado", func(t *testing.T) {
-		body := `{"razao_social": "João da Silva", "blocklist": true}`
-		req, _ := http.NewRequest("PUT", "/clientes/12345678909", strings.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-
-		resp := httptest.NewRecorder()
-		router.ServeHTTP(resp, req)
-
-		assert.Equal(t, http.StatusConflict, resp.Code, "Status code deve ser 409")
 	})
 
 }

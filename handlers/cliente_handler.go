@@ -1,10 +1,8 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/Gileno29/clientes-API/database"
@@ -196,13 +194,9 @@ func (h *ClienteHandler) VerificarCliente(c *gin.Context) {
 // @Failure 409 {object} dtos.ResponseErro "Cliente não identificado"
 // @Failure 500 {object} dtos.ResponseErro "Erro ao atualizar cliente"
 // @Router /clientes/{documento} [put]
-func AtualizaCliente(c *gin.Context) {
+func (h *ClienteHandler) AtualizaCliente(c *gin.Context) {
 
-	documento := c.Param("documento")
-	documento = strings.ReplaceAll(documento, ".", "")
-	documento = strings.ReplaceAll(documento, "-", "")
-	documento = strings.ReplaceAll(documento, "/", "")
-	documento = strings.TrimSpace(documento)
+	documento := utils.ClearNumber(c.Param("documento"))
 
 	if !utils.ValidaDocumento(documento) {
 		erro := dtos.ResponseErro{
@@ -210,16 +204,6 @@ func AtualizaCliente(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusBadRequest, erro)
-		return
-	}
-
-	var cliente models.Cliente
-	if err := database.DB.Where("documento = ?", documento).First(&cliente).Error; err != nil {
-		fmt.Println("Erro ao buscar cliente", err)
-		erro := dtos.ResponseErro{
-			Mensagem: "{'error': 'Cliente Não identificado'}",
-		}
-		c.JSON(http.StatusConflict, erro)
 		return
 	}
 
@@ -232,14 +216,8 @@ func AtualizaCliente(c *gin.Context) {
 		return
 	}
 
-	if dadosAtualizados.RazaoSocial != nil && *dadosAtualizados.RazaoSocial != "" && *dadosAtualizados.RazaoSocial != " " {
-		cliente.RazaoSocial = *dadosAtualizados.RazaoSocial
-	}
-	if dadosAtualizados.Blocklist != nil {
-		cliente.Blocklist = *dadosAtualizados.Blocklist
-	}
-
-	if err := database.DB.Save(&cliente).Error; err != nil {
+	clienteAtualizado, err := h.repo.UpdateByDocumento(documento, &dadosAtualizados)
+	if err != nil {
 		erro := dtos.ResponseErro{
 			Mensagem: "{'error': 'Erro ao atualizar cliente'}",
 		}
@@ -248,9 +226,9 @@ func AtualizaCliente(c *gin.Context) {
 	}
 
 	response := dtos.ClienteResponse{
-		Documento:   cliente.Documento,
-		RazaoSocial: cliente.RazaoSocial,
-		Blocklist:   cliente.Blocklist,
+		Documento:   clienteAtualizado.Documento,
+		RazaoSocial: clienteAtualizado.RazaoSocial,
+		Blocklist:   clienteAtualizado.Blocklist,
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -270,12 +248,7 @@ func AtualizaCliente(c *gin.Context) {
 // @Failure 500 {object} dtos.ResponseErro "Erro ao deletar cliente"
 // @Router /clientes/{documento} [delete]
 func DeletarCliente(c *gin.Context) {
-	documento := c.Param("documento")
-
-	documento = strings.ReplaceAll(documento, ".", "")
-	documento = strings.ReplaceAll(documento, "-", "")
-	documento = strings.ReplaceAll(documento, "/", "")
-	documento = strings.TrimSpace(documento)
+	documento := utils.ClearNumber(c.Param("documento"))
 
 	if !utils.ValidaDocumento(documento) {
 		erro := dtos.ResponseErro{

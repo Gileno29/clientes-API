@@ -39,7 +39,7 @@ func main() {
 	r.GET("/clientes", clienteHandler.ListarClientes)
 	r.GET("/clientes/:documento", clienteHandler.VerificarCliente)
 	r.GET("/status", handlers.Status)
-	r.PUT("/clientes/:documento", handlers.AtualizaCliente)
+	r.PUT("/clientes/:documento", clienteHandler.AtualizaCliente)
 	r.DELETE("/clientes/:documento", handlers.DeletarCliente)
 	r.Run(":8080")
 }
