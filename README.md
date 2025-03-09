@@ -8,9 +8,9 @@ Esse projeto tem como objetivo desenvolver um sistema simples que permite gerenc
 - [Tecnologias](#tecnologias)
 - [Requisitos](#requisitos)
 - [Rodando a Aplicação](#uso)
-- [Estrutura do Banco de Dados](#tabela)
-- [Estrutura do Projeto](#estrutura)
-- [Infraestrutura](#infraestrutura)
+- [utilizacao da API](#Utilizacao)
+- [Rodando os testes da Aplicacao](#testes)
+
 
 <div id='sobre'/>
 
@@ -90,6 +90,7 @@ Seguindo a ordem corretamente, a API vai estar acessível no endpoint: http://lo
 
 Esta API gerencia clientes de uma empresa fictícia.
 
+<div id='Utilizacao'/>
 
 ## Endpoints
 
@@ -228,3 +229,47 @@ curl -X 'GET' \
 'http://localhost:8080/status' \
 -H 'accept: application/json'
 ```
+
+## Rodando os testes da aplicação:
+<div id='testes'/>
+ 
+ A ártir da raiz do projeto rode:
+
+ ```sh
+  ./handlers && go test ./utils
+ ```
+
+ ## Diagramas
+
++-------------------+       +-------------------+       +-------------------+       +-------------------+
+|                   |       |                   |       |                   |       |                   |
+|   Cliente (API    | ----> |   Router (Gin)    | ----> |   Handler          | ----> |   Repository      |
+|   Consumer)       |       |                   |       |   (ClienteHandler) |       |   (ClienteRepo)   |
+|                   |       |                   |       |                   |       |                   |
++-------------------+       +-------------------+       +-------------------+       +-------------------+
+        ^                                                                                   |
+        |                                                                                   v
+        |                                                                           +-------------------+
+        |                                                                           |                   |
+        +---------------------------------------------------------------------------|   Banco de Dados  |
+                                                                                    |                   |
+                                                                                    +-------------------+
+- **Fluxo Cadastro exemplo**:                                                                               
+                                                                
+Cliente          Router          Handler          Repository          Banco de Dados
+   |                |                |                |                      |
+   | POST /clientes |                |                |                      |
+   |--------------->|                |                |                      |
+   |                | CadastrarCliente|                |                      |
+   |                |--------------->|                |                      |
+   |                |                | Valida dados   |                      |
+   |                |                |--------------->|                      |
+   |                |                |                | FindByDocumento      |
+   |                |                |                |--------------------->|
+   |                |                |                |                      |
+   |                |                |                | Create               |
+   |                |                |                |--------------------->|
+   |                |                |                |                      |
+   |                |                |Retorna resposta|                      |
+   |                |<---------------|                |                      |
+   |<---------------|                |                |                      |
