@@ -99,7 +99,7 @@ Opcionalmente a  documentção interativa contida nesse arquivo é possivel util
 no seguinte end point:
 - **URL**: `/swagger/index.html`
 
-
+<img src="https://github.com/Gileno29/clientes-API/blob/main/doc_img/image.png"/>
 
 
 
