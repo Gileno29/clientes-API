@@ -240,7 +240,7 @@ curl -X 'GET' \
  ```
 
  ## Diagramas
-
+```sh
 +-------------------+       +-------------------+       +-------------------+       +-------------------+
 |                   |       |                   |       |                   |       |                   |
 |   Cliente (API    | ----> |   Router (Gin)    | ----> |   Handler          | ----> |   Repository      |
@@ -253,9 +253,10 @@ curl -X 'GET' \
         |                                                                           |                   |
         +---------------------------------------------------------------------------|   Banco de Dados  |
                                                                                     |                   |
-                                                                                    +-------------------+
+```
+                                                                                   +-------------------+
 - **Fluxo Cadastro exemplo**:                                                                               
-                                                                
+```sh                                                         
 Cliente          Router          Handler          Repository          Banco de Dados
    |                |                |                |                      |
    | POST /clientes |                |                |                      |
@@ -273,3 +274,5 @@ Cliente          Router          Handler          Repository          Banco de D
    |                |                |Retorna resposta|                      |
    |                |<---------------|                |                      |
    |<---------------|                |                |                      |
+
+```
