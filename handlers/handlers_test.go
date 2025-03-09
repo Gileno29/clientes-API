@@ -182,7 +182,7 @@ func TestAtualizaCliente(t *testing.T) {
 	// Caso de erro: Cliente não encontrado
 	t.Run("Retorna erro quando cliente não é encontrado", func(t *testing.T) {
 		body := `{"razao_social": "João da Silva", "blocklist": true}`
-		req, _ := http.NewRequest("PUT", "/clientes/12345678901", strings.NewReader(body))
+		req, _ := http.NewRequest("PUT", "/clientes/12345678909", strings.NewReader(body))
 		req.Header.Set("Content-Type", "application/json")
 
 		resp := httptest.NewRecorder()
