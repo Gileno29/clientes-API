@@ -97,21 +97,20 @@ func (h *ClienteHandler) CadastrarCliente(c *gin.Context) {
 // @Failure 400 {object} dtos.ResponseErro "Erro na requisição"
 // @Failure 500 {object} dtos.ResponseErro "Erro interno do servidor"
 // @Router /clientes [get]
-func ListarClientes(c *gin.Context) {
-	var clientes []models.Cliente
-	var total int64
-
-	query := database.DB
-
-	if nome := c.Query("razao_social"); nome != "" {
-		query = query.Where("LOWER(razao_social) LIKE LOWER(?)", "%"+nome+"%")
-	}
-
+func (h *ClienteHandler) ListarClientes(c *gin.Context) {
+	razaoSocial := c.Query("razao_social")
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
-	offset := (page - 1) * limit
 
-	query.Find(&clientes)
+	clientes, total, err := h.repo.ListarClientes(razaoSocial, page, limit)
+
+	if err != nil {
+		erro := dtos.ResponseErro{
+			Mensagem: "{'error': 'Erro ao listar clientes'}",
+		}
+		c.JSON(http.StatusInternalServerError, erro)
+		return
+	}
 
 	if len(clientes) == 0 {
 		erro := dtos.ResponseErro{
@@ -120,10 +119,6 @@ func ListarClientes(c *gin.Context) {
 		c.JSON(http.StatusNotFound, erro)
 		return
 	}
-
-	query.Model(&models.Cliente{}).Count(&total)
-
-	query.Order("razao_social asc").Offset(offset).Limit(limit).Find(&clientes)
 
 	var clientesResponse []dtos.ClienteResponse
 
@@ -134,6 +129,7 @@ func ListarClientes(c *gin.Context) {
 			Blocklist:   cliente.Blocklist,
 		})
 	}
+
 	resposta := dtos.ListarClientesResponse{
 		Page:     page,
 		Limit:    limit,
@@ -155,11 +151,8 @@ func ListarClientes(c *gin.Context) {
 // @Failure 400 {object} dtos.ResponseErro "Documento inválido"
 // @Failure 404 {object} dtos.ResponseErro "Cliente não encontrado"
 // @Router /clientes/{documento} [get]
-func VerificarCliente(c *gin.Context) {
-	documento := c.Param("documento")
-	documento = strings.ReplaceAll(documento, ".", "")
-	documento = strings.ReplaceAll(documento, "-", "")
-	documento = strings.ReplaceAll(documento, "/", "")
+func (h *ClienteHandler) VerificarCliente(c *gin.Context) {
+	documento := utils.ClearNumber(c.Param("documento"))
 
 	if !utils.ValidaDocumento(documento) {
 		erro := dtos.ResponseErro{
@@ -170,8 +163,8 @@ func VerificarCliente(c *gin.Context) {
 		return
 	}
 
-	var cliente models.Cliente
-	if err := database.DB.Where("documento = ?", documento).First(&cliente).Error; err != nil {
+	cliente, err := h.repo.FindByDocumento(documento)
+	if err != nil {
 		erro := dtos.ResponseErro{
 			Mensagem: "{'error': 'Cliente não encontrado'}",
 		}

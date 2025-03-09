@@ -26,17 +26,18 @@ func main() {
 
 	// Cria o repository
 	clienteRepo := repository.NewClienteRepository(db)
-
 	clienteHandler := handlers.NewClienteHandler(clienteRepo)
 
+	// instancia o GIN
 	r := gin.Default()
 
+	// configura ara utilizzar o midware para interceptação e contagem das requests.
 	r.Use(middlewares.RequestCounterMiddleware())
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	r.POST("/clientes", clienteHandler.CadastrarCliente)
-	r.GET("/clientes", handlers.ListarClientes)
-	r.GET("/clientes/:documento", handlers.VerificarCliente)
+	r.GET("/clientes", clienteHandler.ListarClientes)
+	r.GET("/clientes/:documento", clienteHandler.VerificarCliente)
 	r.GET("/status", handlers.Status)
 	r.PUT("/clientes/:documento", handlers.AtualizaCliente)
 	r.DELETE("/clientes/:documento", handlers.DeletarCliente)

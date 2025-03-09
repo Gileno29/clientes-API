@@ -51,3 +51,25 @@ func (r *clienteRepository) UpdateByDocumento(documento string, cliente *models.
 func (r *clienteRepository) DeleteByDocumento(documento string) error {
 	return r.db.Where("documento = ?", documento).Delete(&models.Cliente{}).Error
 }
+
+func (r *clienteRepository) ListarClientes(razaoSocial string, page, limit int) ([]models.Cliente, int64, error) {
+	var clientes []models.Cliente
+	var total int64
+
+	query := r.db.Model(&models.Cliente{})
+
+	if razaoSocial != "" {
+		query = query.Where("LOWER(razao_social) LIKE LOWER(?)", "%"+razaoSocial+"%")
+	}
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	offset := (page - 1) * limit
+	if err := query.Order("razao_social ASC").Offset(offset).Limit(limit).Find(&clientes).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return clientes, total, nil
+}

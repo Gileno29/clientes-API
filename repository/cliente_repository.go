@@ -9,4 +9,5 @@ type ClienteRepository interface {
 	FindByDocumento(documento string) (*models.Cliente, error)
 	UpdateByDocumento(documento string, cliente *models.Cliente) error
 	DeleteByDocumento(documento string) error
+	ListarClientes(razaoSocial string, page, limit int) ([]models.Cliente, int64, error)
 }
