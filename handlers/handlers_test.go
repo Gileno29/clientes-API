@@ -1,16 +1,19 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/Gileno29/clientes-API/database"
+	_ "github.com/Gileno29/clientes-API/mocks"
 	"github.com/Gileno29/clientes-API/models"
 	"github.com/Gileno29/clientes-API/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -183,6 +186,48 @@ func TestAtualizaCliente(t *testing.T) {
 		router.ServeHTTP(resp, req)
 
 		assert.Equal(t, http.StatusOK, resp.Code, "Status code deve ser 200")
+	})
+
+	t.Run("Retorna erro quando cliente não é encontrado", func(t *testing.T) {
+		req, _ := http.NewRequest("DELETE", "/clientes/12345678909", nil)
+		resp := httptest.NewRecorder()
+		router.ServeHTTP(resp, req)
+
+		assert.Equal(t, http.StatusNotFound, resp.Code, "Status code deve ser 404")
+	})
+
+	// Caso de erro: Dados inválidos (JSON malformado ou campos vazios)
+	t.Run("Retorna erro quando dados são inválidos", func(t *testing.T) {
+		body := `{"razao_social": "", "blocklist": true}` // Razão social vazia
+		req, _ := http.NewRequest("PUT", "/clientes/52998224725", strings.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+
+		resp := httptest.NewRecorder()
+		router.ServeHTTP(resp, req)
+
+		assert.Equal(t, http.StatusBadRequest, resp.Code, "Status code deve ser 400")
+	})
+
+	// Caso de erro: Erro ao atualizar cliente no banco de dados
+	t.Run("Retorna erro ao atualizar cliente no banco de dados", func(t *testing.T) {
+		// Simula um erro no repository (ex: banco de dados indisponível)
+		// Aqui você pode usar um mock do repository para forçar um erro
+		mockRepo := new(MockClienteRepository)
+		mockRepo.On("UpdateByDocumento", mock.Anything, mock.Anything).Return(nil, errors.New("erro ao atualizar cliente"))
+
+		handler := NewClienteHandler(mockRepo)
+
+		router := gin.Default()
+		router.PUT("/clientes/:documento", handler.AtualizaCliente)
+
+		body := `{"razao_social": "João da Silva", "blocklist": true}`
+		req, _ := http.NewRequest("PUT", "/clientes/52998224725", strings.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+
+		resp := httptest.NewRecorder()
+		router.ServeHTTP(resp, req)
+
+		assert.Equal(t, http.StatusInternalServerError, resp.Code, "Status code deve ser 500")
 	})
 
 }
