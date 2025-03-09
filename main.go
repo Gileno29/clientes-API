@@ -7,6 +7,7 @@ import (
 	_ "github.com/Gileno29/clientes-API/docs"
 	"github.com/Gileno29/clientes-API/handlers"
 	"github.com/Gileno29/clientes-API/middlewares"
+	"github.com/Gileno29/clientes-API/repository"
 	"github.com/Gileno29/clientes-API/utils"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -21,16 +22,27 @@ func main() {
 
 	database.Connect()
 
+	db := database.DB
+
+	// Instancia repository e handler
+	clienteRepo := repository.NewClienteRepository(db)
+	clienteHandler := handlers.NewClienteHandler(clienteRepo)
+
+	// Cria o handler de suporte
+	suporteHandler := handlers.NewSuporteHandler()
+
+	// instancia o GIN
 	r := gin.Default()
 
+	// configura ara utilizzar o midware para interceptação e contagem das requests.
 	r.Use(middlewares.RequestCounterMiddleware())
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	r.POST("/clientes", handlers.CadastrarCliente)
-	r.GET("/clientes", handlers.ListarClientes)
-	r.GET("/clientes/:documento", handlers.VerificarCliente)
-	r.GET("/status", handlers.Status)
-	r.PUT("/clientes/:documento", handlers.AtualizaCliente)
-	r.DELETE("/clientes/:documento", handlers.DeletarCliente)
+	r.POST("/clientes", clienteHandler.CadastrarCliente)
+	r.GET("/clientes", clienteHandler.ListarClientes)
+	r.GET("/clientes/:documento", clienteHandler.VerificarCliente)
+	r.GET("/status", suporteHandler.Status)
+	r.PUT("/clientes/:documento", clienteHandler.AtualizaCliente)
+	r.DELETE("/clientes/:documento", clienteHandler.DeletarCliente)
 	r.Run(":8080")
 }

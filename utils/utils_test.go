@@ -96,3 +96,58 @@ func TestVerificarTabelaClientes(t *testing.T) {
 		assert.True(t, hasTable, "A tabela de clientes deve continuar existindo")
 	})
 }
+
+func TestClearNumber(t *testing.T) {
+	// Casos de teste
+	tests := []struct {
+		name     string // Nome do teste
+		input    string // Entrada da função
+		expected string // Saída esperada
+	}{
+		{
+			name:     "String sem caracteres especiais",
+			input:    "123456789",
+			expected: "123456789",
+		},
+		{
+			name:     "String com pontos",
+			input:    "123.456.789",
+			expected: "123456789",
+		},
+		{
+			name:     "String com hífens",
+			input:    "123-456-789",
+			expected: "123456789",
+		},
+		{
+			name:     "String com barras",
+			input:    "123/456/789",
+			expected: "123456789",
+		},
+		{
+			name:     "String com pontos, hífens e barras",
+			input:    "123.456-789/000",
+			expected: "123456789000",
+		},
+		{
+			name:     "String vazia",
+			input:    "",
+			expected: "",
+		},
+		{
+			name:     "String com apenas caracteres especiais",
+			input:    "./-",
+			expected: "",
+		},
+	}
+
+	// Executa os testes
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := ClearNumber(tt.input)
+			if result != tt.expected {
+				t.Errorf("ClearNumber(%s) = %s; esperado %s", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
