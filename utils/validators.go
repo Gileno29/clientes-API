@@ -15,11 +15,16 @@ var StartTime time.Time
 // pagina para referencia e consulta a respeito de calculo do digito verificador de cpf/cnpj
 // URL: https://www.devmedia.com.br/validando-o-cpf-em-uma-aplicacao-java/22374
 
-func ValidaDocumento(cpfcnpj string) bool {
-	cpfcnpj = strings.ReplaceAll(cpfcnpj, ".", "")
-	cpfcnpj = strings.ReplaceAll(cpfcnpj, "-", "")
-	cpfcnpj = strings.ReplaceAll(cpfcnpj, "/", "")
+func ClearNumber(n string) string {
+	newString := n
+	newString = strings.ReplaceAll(newString, ".", "")
+	newString = strings.ReplaceAll(newString, "-", "")
+	newString = strings.ReplaceAll(newString, "/", "")
+	return newString
+}
 
+func ValidaDocumento(cpfcnpj string) bool {
+	cpfcnpj = ClearNumber(cpfcnpj)
 	if len(cpfcnpj) < 11 || len(cpfcnpj) > 14 {
 		return false
 	}
