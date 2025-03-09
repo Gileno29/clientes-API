@@ -28,12 +28,8 @@ func (r *clienteRepository) FindByDocumento(documento string) (*models.Cliente, 
 	return &cliente, nil
 }
 
-func (r *clienteRepository) UpdateByDocumento(documento string, dadosAtualizados *dtos.AtualizaClienteRequest) (*models.Cliente, error) {
+func (r *clienteRepository) UpdateByDocumento(cliente *models.Cliente, dadosAtualizados *dtos.AtualizaClienteRequest) (*models.Cliente, error) {
 	// Busca o cliente pelo documento
-	var cliente models.Cliente
-	if err := r.db.Where("documento = ?", documento).First(&cliente).Error; err != nil {
-		return nil, err // Retorna erro se o cliente não for encontrado
-	}
 
 	// Atualiza os campos do cliente
 	if dadosAtualizados.RazaoSocial != nil && *dadosAtualizados.RazaoSocial != "" && *dadosAtualizados.RazaoSocial != " " {
@@ -43,11 +39,11 @@ func (r *clienteRepository) UpdateByDocumento(documento string, dadosAtualizados
 		cliente.Blocklist = *dadosAtualizados.Blocklist
 	}
 
-	if err := r.db.Save(&cliente).Error; err != nil {
+	if err := r.db.Save(cliente).Error; err != nil {
 		return nil, err
 	}
 
-	return &cliente, nil
+	return cliente, nil
 }
 
 // DeleteByDocumento remove um cliente pelo documento

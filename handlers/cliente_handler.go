@@ -206,6 +206,15 @@ func (h *ClienteHandler) AtualizaCliente(c *gin.Context) {
 		return
 	}
 
+	cliente, err := h.repo.FindByDocumento(documento)
+	if err != nil {
+		erro := dtos.ResponseErro{
+			Mensagem: "{'error': 'Cliente não encontrado'}",
+		}
+		c.JSON(http.StatusNotFound, erro)
+		return
+	}
+
 	var dadosAtualizados dtos.AtualizaClienteRequest
 	if err := c.ShouldBindJSON(&dadosAtualizados); err != nil {
 		erro := dtos.ResponseErro{
@@ -215,7 +224,7 @@ func (h *ClienteHandler) AtualizaCliente(c *gin.Context) {
 		return
 	}
 
-	clienteAtualizado, err := h.repo.UpdateByDocumento(documento, &dadosAtualizados)
+	clienteAtualizado, err := h.repo.UpdateByDocumento(cliente, &dadosAtualizados)
 	if err != nil {
 		erro := dtos.ResponseErro{
 			Mensagem: "{'error': 'Erro ao atualizar cliente'}",
@@ -267,6 +276,7 @@ func (h *ClienteHandler) DeletarCliente(c *gin.Context) {
 	}
 
 	if err := h.repo.DeleteByDocumento(documento); err != nil {
+
 		erro := dtos.ResponseErro{
 			Mensagem: "{'error': 'Erro ao deletar cliente'}",
 		}
