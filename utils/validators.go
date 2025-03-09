@@ -23,8 +23,8 @@ func ClearNumber(n string) string {
 	return newString
 }
 
-func ValidaDocumento(cpfcnpj string) bool {
-	cpfcnpj = ClearNumber(cpfcnpj)
+func ValidaDocumento(documento string) bool {
+	cpfcnpj := ClearNumber(documento)
 	if len(cpfcnpj) < 11 || len(cpfcnpj) > 14 {
 		return false
 	}

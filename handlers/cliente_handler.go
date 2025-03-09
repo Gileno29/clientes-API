@@ -35,7 +35,6 @@ func NewClienteHandler(repo repository.ClienteRepository) *ClienteHandler {
 // @Router /clientes [post]
 func (h *ClienteHandler) CadastrarCliente(c *gin.Context) {
 	var cliente models.Cliente
-
 	if err := c.ShouldBindJSON(&cliente); err != nil {
 		erro := dtos.ResponseErro{
 			Mensagem: "{'error':" + err.Error() + "}",
@@ -43,9 +42,10 @@ func (h *ClienteHandler) CadastrarCliente(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, erro)
 		return
 	}
+	documento := utils.ClearNumber(cliente.Documento)
+	cliente.Documento = documento
 
-	// Valida CPF/CNPJ
-	if !utils.ValidaDocumento(cliente.Documento) {
+	if !utils.ValidaDocumento(documento) {
 		erro := dtos.ResponseErro{
 			Mensagem: "{'error': 'Documento inválido'}",
 		}
