@@ -37,7 +37,7 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	router.GET("/clientes", clienteHandler.ListarClientes)
 	router.GET("/clientes/:documento", clienteHandler.VerificarCliente)
 	router.PUT("/clientes/:documento", clienteHandler.AtualizaCliente)
-	router.DELETE("/clientes/:documento", DeletarCliente)
+	router.DELETE("/clientes/:documento", clienteHandler.DeletarCliente)
 	router.GET("/status", Status)
 	return router
 }

@@ -24,7 +24,7 @@ func main() {
 
 	db := database.DB
 
-	// Cria o repository
+	// Instancia repository e handler
 	clienteRepo := repository.NewClienteRepository(db)
 	clienteHandler := handlers.NewClienteHandler(clienteRepo)
 
@@ -40,6 +40,6 @@ func main() {
 	r.GET("/clientes/:documento", clienteHandler.VerificarCliente)
 	r.GET("/status", handlers.Status)
 	r.PUT("/clientes/:documento", clienteHandler.AtualizaCliente)
-	r.DELETE("/clientes/:documento", handlers.DeletarCliente)
+	r.DELETE("/clientes/:documento", clienteHandler.DeletarCliente)
 	r.Run(":8080")
 }

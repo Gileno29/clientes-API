@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Gileno29/clientes-API/database"
 	"github.com/Gileno29/clientes-API/dtos"
 	"github.com/Gileno29/clientes-API/middlewares"
 	"github.com/Gileno29/clientes-API/models"
@@ -247,7 +246,7 @@ func (h *ClienteHandler) AtualizaCliente(c *gin.Context) {
 // @Failure 404 {object} dtos.ResponseErro "Cliente não encontrado"
 // @Failure 500 {object} dtos.ResponseErro "Erro ao deletar cliente"
 // @Router /clientes/{documento} [delete]
-func DeletarCliente(c *gin.Context) {
+func (h *ClienteHandler) DeletarCliente(c *gin.Context) {
 	documento := utils.ClearNumber(c.Param("documento"))
 
 	if !utils.ValidaDocumento(documento) {
@@ -258,8 +257,8 @@ func DeletarCliente(c *gin.Context) {
 		return
 	}
 
-	var cliente models.Cliente
-	if err := database.DB.Where("documento = ?", documento).First(&cliente).Error; err != nil {
+	_, err := h.repo.FindByDocumento(documento)
+	if err != nil {
 		erro := dtos.ResponseErro{
 			Mensagem: "{'error': 'Cliente não encontrado'}",
 		}
@@ -267,7 +266,7 @@ func DeletarCliente(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Delete(&cliente).Error; err != nil {
+	if err := h.repo.DeleteByDocumento(documento); err != nil {
 		erro := dtos.ResponseErro{
 			Mensagem: "{'error': 'Erro ao deletar cliente'}",
 		}
