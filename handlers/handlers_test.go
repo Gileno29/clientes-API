@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -8,8 +9,9 @@ import (
 	"testing"
 
 	"github.com/Gileno29/clientes-API/database"
+	"github.com/Gileno29/clientes-API/dtos"
 	"github.com/Gileno29/clientes-API/mocks"
-	_ "github.com/Gileno29/clientes-API/mocks"
+
 	"github.com/Gileno29/clientes-API/models"
 	"github.com/Gileno29/clientes-API/repository"
 	"github.com/gin-gonic/gin"
@@ -199,14 +201,22 @@ func TestAtualizaCliente(t *testing.T) {
 
 	// Caso de erro: Dados inválidos (JSON malformado ou campos vazios)
 	t.Run("Retorna erro quando dados são inválidos", func(t *testing.T) {
-		body := `{"razao_social": "", "blocklist": true}` // Razão social vazia
+		// Corpo da requisição com tipo incorreto para razao_social
+		body := `{"razao_social":"gileno", "blocklist": Frue}` // razao_social é um número, mas deveria ser uma string
 		req, _ := http.NewRequest("PUT", "/clientes/52998224725", strings.NewReader(body))
 		req.Header.Set("Content-Type", "application/json")
 
 		resp := httptest.NewRecorder()
 		router.ServeHTTP(resp, req)
 
+		// Verifica o status code
 		assert.Equal(t, http.StatusBadRequest, resp.Code, "Status code deve ser 400")
+
+		// Verifica a mensagem de erro
+		var erroResponse dtos.ResponseErro
+		err := json.Unmarshal(resp.Body.Bytes(), &erroResponse)
+		assert.NoError(t, err, "Erro ao decodificar a resposta")
+		assert.Contains(t, erroResponse.Mensagem, "Dados inválidos", "Mensagem de erro deve indicar dados inválidos")
 	})
 
 	// Caso de erro: Erro ao atualizar cliente no banco de dados
@@ -214,6 +224,14 @@ func TestAtualizaCliente(t *testing.T) {
 		// Simula um erro no repository (ex: banco de dados indisponível)
 		// Aqui você pode usar um mock do repository para forçar um erro
 		mockRepo := new(mocks.MockClienteRepository)
+
+		clienteExistente := &models.Cliente{
+			Documento:   "52998224725",
+			RazaoSocial: "João Silva",
+			Blocklist:   false,
+		}
+		mockRepo.On("FindByDocumento", "52998224725").Return(clienteExistente, nil)
+
 		mockRepo.On("UpdateByDocumento", mock.Anything, mock.Anything).Return(nil, errors.New("erro ao atualizar cliente"))
 
 		handler := NewClienteHandler(mockRepo)
@@ -229,6 +247,58 @@ func TestAtualizaCliente(t *testing.T) {
 		router.ServeHTTP(resp, req)
 
 		assert.Equal(t, http.StatusInternalServerError, resp.Code, "Status code deve ser 500")
+	})
+
+	// Caso de sucesso: Atualiza cliente com sucesso
+	t.Run("Atualiza cliente com sucesso", func(t *testing.T) {
+		// Cria o mock do repository
+		mockRepo := new(mocks.MockClienteRepository)
+
+		// Configura o comportamento esperado do mock para FindByDocumento
+		clienteExistente := &models.Cliente{
+			Documento:   "52998224725",
+			RazaoSocial: "João Silva",
+			Blocklist:   false,
+		}
+		mockRepo.On("FindByDocumento", "52998224725").Return(clienteExistente, nil)
+
+		// Configura o comportamento esperado do mock para UpdateByDocumento
+		clienteAtualizado := &models.Cliente{
+			Documento:   "52998224725",
+			RazaoSocial: "João da Silva", // Razão social atualizada
+			Blocklist:   true,            // Blocklist atualizado
+		}
+		mockRepo.On("UpdateByDocumento", clienteExistente, mock.Anything).Return(clienteAtualizado, nil)
+
+		// Cria o handler com o mock do repository
+		handler := NewClienteHandler(mockRepo)
+
+		// Configura o router
+		router := gin.Default()
+		router.PUT("/clientes/:documento", handler.AtualizaCliente)
+
+		// Cria a requisição
+		body := `{"razao_social": "João da Silva", "blocklist": true}`
+		req, _ := http.NewRequest("PUT", "/clientes/52998224725", strings.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+
+		// Executa a requisição
+		resp := httptest.NewRecorder()
+		router.ServeHTTP(resp, req)
+
+		// Verifica o resultado
+		assert.Equal(t, http.StatusOK, resp.Code, "Status code deve ser 200")
+
+		// Verifica o corpo da resposta
+		var response dtos.ClienteResponse
+		err := json.Unmarshal(resp.Body.Bytes(), &response)
+		assert.NoError(t, err, "Erro ao decodificar a resposta")
+		assert.Equal(t, "52998224725", response.Documento, "Documento deve ser igual")
+		assert.Equal(t, "João da Silva", response.RazaoSocial, "Razão social deve ser atualizada")
+		assert.True(t, response.Blocklist, "Blocklist deve ser true")
+
+		// Garante que o mock foi chamado conforme o esperado
+		mockRepo.AssertExpectations(t)
 	})
 
 }
@@ -266,6 +336,7 @@ func TestDeletarCliente(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, resp.Code, "Status code deve ser 400")
 	})
+
 }
 
 func TestStatus(t *testing.T) {

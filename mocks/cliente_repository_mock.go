@@ -20,8 +20,8 @@ func (m *MockClienteRepository) FindByDocumento(documento string) (*models.Clien
 	return args.Get(0).(*models.Cliente), args.Error(1)
 }
 
-func (m *MockClienteRepository) UpdateByDocumento(documento string, dadosAtualizados *dtos.AtualizaClienteRequest) (*models.Cliente, error) {
-	args := m.Called(documento, dadosAtualizados)
+func (m *MockClienteRepository) UpdateByDocumento(cliente *models.Cliente, dadosAtualizados *dtos.AtualizaClienteRequest) (*models.Cliente, error) {
+	args := m.Called(cliente, dadosAtualizados)
 	return args.Get(0).(*models.Cliente), args.Error(1)
 }
 

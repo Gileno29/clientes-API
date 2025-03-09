@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -217,7 +218,7 @@ func (h *ClienteHandler) AtualizaCliente(c *gin.Context) {
 	var dadosAtualizados dtos.AtualizaClienteRequest
 	if err := c.ShouldBindJSON(&dadosAtualizados); err != nil {
 		erro := dtos.ResponseErro{
-			Mensagem: "{'error': 'Dados inválidos, Algum parâmetro está vazio'}",
+			Mensagem: fmt.Sprintf("{'error': 'Dados inválidos: %v'}", err.Error()),
 		}
 		c.JSON(http.StatusBadRequest, erro)
 		return
