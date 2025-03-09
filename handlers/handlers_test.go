@@ -32,13 +32,15 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	clienteRepo := repository.NewClienteRepository(db)
 	clienteHandler := NewClienteHandler(clienteRepo)
 
+	suporteHandler := NewSuporteHandler()
+
 	router := gin.Default()
 	router.POST("/clientes", clienteHandler.CadastrarCliente)
 	router.GET("/clientes", clienteHandler.ListarClientes)
 	router.GET("/clientes/:documento", clienteHandler.VerificarCliente)
 	router.PUT("/clientes/:documento", clienteHandler.AtualizaCliente)
 	router.DELETE("/clientes/:documento", clienteHandler.DeletarCliente)
-	router.GET("/status", Status)
+	router.GET("/status", suporteHandler.Status)
 	return router
 }
 

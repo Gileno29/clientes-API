@@ -28,6 +28,9 @@ func main() {
 	clienteRepo := repository.NewClienteRepository(db)
 	clienteHandler := handlers.NewClienteHandler(clienteRepo)
 
+	// Cria o handler de suporte
+	suporteHandler := handlers.NewSuporteHandler()
+
 	// instancia o GIN
 	r := gin.Default()
 
@@ -38,7 +41,7 @@ func main() {
 	r.POST("/clientes", clienteHandler.CadastrarCliente)
 	r.GET("/clientes", clienteHandler.ListarClientes)
 	r.GET("/clientes/:documento", clienteHandler.VerificarCliente)
-	r.GET("/status", handlers.Status)
+	r.GET("/status", suporteHandler.Status)
 	r.PUT("/clientes/:documento", clienteHandler.AtualizaCliente)
 	r.DELETE("/clientes/:documento", clienteHandler.DeletarCliente)
 	r.Run(":8080")
