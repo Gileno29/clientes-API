@@ -16,7 +16,7 @@ Esse projeto tem como objetivo desenvolver um sistema simples que permite gerenc
 
 ## Sobre
 
-Essa API foi desenvolvida para  realizar o cadastros, atualização e remoção de dados de cadastros de clientes.
+Essa API foi desenvolvida para  realizar o cadastros, atualização e remoção de dados  de clientes.
 
 <div id='tecnologias'/>
 
