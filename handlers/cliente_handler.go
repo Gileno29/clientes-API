@@ -3,10 +3,9 @@ package handlers
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/Gileno29/clientes-API/dtos"
-	"github.com/Gileno29/clientes-API/middlewares"
+
 	"github.com/Gileno29/clientes-API/models"
 	"github.com/Gileno29/clientes-API/repository"
 	"github.com/Gileno29/clientes-API/utils"
@@ -288,25 +287,4 @@ func (h *ClienteHandler) DeletarCliente(c *gin.Context) {
 		Mensagem: "Cliente deletado com sucesso",
 	}
 	c.JSON(http.StatusOK, resposta)
-}
-
-// Status godoc
-// @Summary Retorna o status do servidor
-// @Description Retorna informações sobre o tempo de atividade (uptime) e o número de requisições atendidas.
-// @Tags suporte
-// @Accept json
-// @Produce json
-// @Success 200 {object} dtos.ResponseStatus "Status do servidor"
-// @Router /status [get]
-func Status(c *gin.Context) {
-
-	//uptime := time.Since(utils.StartTime).Seconds()
-
-	//requests := middlewares.GetRequestCount()
-
-	status := dtos.ResponseStatus{
-		Uptime:   time.Since(utils.StartTime).Seconds(),
-		Requests: middlewares.GetRequestCount(),
-	}
-	c.JSON(http.StatusOK, status)
 }
