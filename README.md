@@ -116,7 +116,18 @@ no seguinte end point:
   - `201 Created`: Cliente cadastrado com sucesso.
   - `400 Bad Request`: Dados inválidos.
   - `409 Conflict`: Cliente já cadastrado.
-
+- **Exemplo**:
+```sh
+curl -X 'POST' \
+'http://localhost:8080/clientes' \
+-H 'accept: application/json' \
+-H 'Content-Type: application/json' \
+-d '{
+"blocklist": true,
+"documento": "86405508838",
+"razaosocial": "Maria Oliveira"
+}'
+```
 ### Listar Clientes
 - **Método**: `GET`
 - **URL**: `/clientes`
@@ -129,6 +140,21 @@ no seguinte end point:
   - `200 OK`: Lista de clientes.
   - `404 Not Found`: Nenhum cliente encontrado.
 
+- **Exemplo Listagem Completa**:
+```sh
+curl -X 'GET' \
+'http://localhost:8080/clientes?page=1&limit=10' \
+-H 'accept: application/json'
+```
+
+- **Exemplo Listagem Filtro razao social**:
+```sh
+curl -X 'GET' \
+'http://localhost:8080/clientes?razao_social=gileno&page=1&limit=10' \
+-H 'accept: application/json'
+```
+
+
 ### Verificar Cliente
 - **Método**: `GET`
 - **URL**: `/clientes/{documento}`
@@ -138,6 +164,12 @@ no seguinte end point:
 - **Respostas**:
   - `200 OK`: Cliente encontrado.
   - `404 Not Found`: Cliente não encontrado.
+- **Exemplo**:
+```sh
+curl -X 'GET' \
+'http://localhost:8080/clientes/86405508838' \
+-H 'accept: application/json'
+```
 
 ### Atualizar Cliente
 - **Método**: `PUT`
@@ -153,6 +185,18 @@ no seguinte end point:
   - `404 Not Found`: Cliente não encontrado.
   - `500 Internal Server Error`: Erro ao atualizar cliente.
 
+- **Exemplo**:
+```sh
+ curl -X 'PUT' \
+'http://localhost:8080/clientes/52998224725' \
+-H 'accept: application/json' \
+-H 'Content-Type: application/json' \
+-d '{
+"blocklist": true,
+"razaosocial": "Geisiele"
+}'
+```
+
 ### Deletar Cliente
 - **Método**: `DELETE`
 - **URL**: `/clientes/{documento}`
@@ -165,9 +209,22 @@ no seguinte end point:
   - `404 Not Found`: Cliente não encontrado.
   - `500 Internal Server Error`: Erro ao deletar cliente.
 
+- **Exemplo**:
+```sh
+curl -X 'DELETE' \
+'http://localhost:8080/clientes/86405508838' \
+-H 'accept: application/json'
+```
 ### Status do Servidor
 - **Método**: `GET`
 - **URL**: `/status`
 - **Descrição**: Retorna informações sobre o tempo de atividade e o número de requisições atendidas.
 - **Respostas**:
   - `200 OK`: Status do servidor.
+
+- **Exemplo**:
+```sh
+curl -X 'GET' \
+'http://localhost:8080/status' \
+-H 'accept: application/json'
+```
