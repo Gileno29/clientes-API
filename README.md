@@ -56,7 +56,7 @@ Instruções para iniciar a aplicação.
 git clone https://github.com/Gileno29/clientes-API.git
 
 # Navegue até o diretório do projeto
-cd cd clientes-API/
+cd clientes-API/
 ```
 Será necessário criar um arquivo de variáveis ".env" na raiz do projeto
 
@@ -77,11 +77,11 @@ PRO_DATABASE_PORT=5432
 ```
 
 ```sh
-docker-compose up --build
+sudo docker compose up --build
 
   OU 
 
-docker-compose up -d  --build #rodar em backgroud
+sudo docker compose up -d  --build #rodar em backgroud
 ```
 *Obs:* Verifique se já possui serviços funcionando em sua máquina nas portas da aplicação, caso haja, desative-os.
 
