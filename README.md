@@ -9,7 +9,8 @@ Esse projeto tem como objetivo desenvolver um sistema simples que permite gerenc
 - [Requisitos](#requisitos)
 - [Rodando a Aplicação](#uso)
 - [utilizacao da API](#Utilizacao)
-- [Rodando os testes da Aplicacao](#testes)
+- [Rodando os testes da Aplicação](#testes)
+- [Diagamas](#diagramas)
 
 
 <div id='sobre'/>
@@ -42,6 +43,7 @@ Essa API foi desenvolvida para  realizar o cadastros, atualização e remoção 
   <li>Git</li>
   <li>Deve possuir o <a href="https://docs.docker.com/engine/install/">Docker</a> e também o <a href="https://docs.docker.com/compose/install/">Docker-compose</a> instalados em sua máquina.</li>
 </ul>
+
 
 <div id='uso'/>
 
@@ -116,6 +118,7 @@ no seguinte end point:
 - **Respostas**:
   - `201 Created`: Cliente cadastrado com sucesso.
   - `400 Bad Request`: Dados inválidos.
+  - `400 Bad Resquest`: Documento inválido.
   - `409 Conflict`: Cliente já cadastrado.
 - **Exemplo**:
 ```sh
@@ -139,6 +142,7 @@ curl -X 'POST' \
   - `limit` (int, opcional): Número de itens por página (padrão: 10).
 - **Respostas**:
   - `200 OK`: Lista de clientes.
+  - `400 Bad Resquest`: Documento inválido.
   - `404 Not Found`: Nenhum cliente encontrado.
 
 - **Exemplo Listagem Completa**:
@@ -164,6 +168,7 @@ curl -X 'GET' \
   - `documento` (string): CPF/CNPJ do cliente.
 - **Respostas**:
   - `200 OK`: Cliente encontrado.
+  - `400 Bad Resquest`: Documento inválido.
   - `404 Not Found`: Cliente não encontrado.
 - **Exemplo**:
 ```sh
@@ -183,6 +188,7 @@ curl -X 'GET' \
 - **Respostas**:
   - `200 OK`: Cliente atualizado com sucesso.
   - `400 Bad Request`: Dados inválidos.
+  - `400 Bad Resquest`: Documento inválido.
   - `404 Not Found`: Cliente não encontrado.
   - `500 Internal Server Error`: Erro ao atualizar cliente.
 
@@ -236,25 +242,30 @@ curl -X 'GET' \
  A ártir da raiz do projeto rode:
 
  ```sh
-  ./handlers && go test ./utils
+ go  ./handlers && go test ./utils
  ```
 
+
+
+
  ## Diagramas
+<div id='diagramas'/>
+
 ```sh
 +-------------------+       +-------------------+       +-------------------+       +-------------------+
-|                   |       |                   |       |                   |       |                   |
+|                   |       |                   |       |                    |       |                   |
 |   Cliente (API    | ----> |   Router (Gin)    | ----> |   Handler          | ----> |   Repository      |
 |   Consumer)       |       |                   |       |   (ClienteHandler) |       |   (ClienteRepo)   |
-|                   |       |                   |       |                   |       |                   |
+|                   | <---  |                   | <---  |                    |  <--- |                   |
 +-------------------+       +-------------------+       +-------------------+       +-------------------+
-        ^                                                                                   |
-        |                                                                                   v
-        |                                                                           +-------------------+
-        |                                                                           |                   |
-        +---------------------------------------------------------------------------|   Banco de Dados  |
+                                                                                         ^     |
+                                                                                         |     v
+                                                                                    +-------------------+
+                                                                                    |                   |
+                                                                                    |   Banco de Dados  |
                                                                                     |                   |
 ```
-                                                                                   +-------------------+
+                                                                                    +-------------------+
 - **Fluxo Cadastro exemplo**:                                                                               
 ```sh                                                         
 Cliente          Router          Handler          Repository          Banco de Dados
